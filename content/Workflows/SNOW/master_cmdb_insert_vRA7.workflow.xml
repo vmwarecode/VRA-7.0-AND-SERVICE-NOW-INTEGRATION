@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow xmlns="http://vmware.com/vco/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://vmware.com/vco/workflow http://vmware.com/vco/workflow/Workflow-v4.xsd" root-name="item1" object-name="workflow:name=generic" id="93735bcb-671e-4b23-a78b-a3a797384ad6" version="0.0.10" api-version="6.0.0" allowed-operations="fve" restartMode="1" resumeFromFailedMode="0">
+    <display-name>master_cmdb_insert_vRA7</display-name>
+
+    <description>vRA 7 CMDB Insert.</description>
+
+    <position x="100.0" y="50.0"/>
+
+    <input>
+        <param name="payload" type="Properties"/>
+    </input>
+
+    <output>
+        <param name="virtualMachineAddOrUpdateProperties" type="Properties"/>
+    </output>
+
+    <attrib name="vmname" type="string" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="sys_id" type="string" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="cpus" type="String" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="ip_address" type="String" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="memory" type="String" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+    <attrib name="disks_size" type="String" read-only="false">
+        <value encoded="n"/>
+    </attrib>
+
+    <workflow-item name="item0" type="end" end-mode="0">
+        <position x="804.5" y="45.40909090909091"/>
+    </workflow-item>
+
+    <workflow-item name="item1" out-name="item2" type="task">
+        <display-name>Get VM Properties</display-name>
+
+        <script encoded="false">
+/*
+Default values that are presented by vRA. These are the default properties passed
+to vRO based on the standard payload input
+*/
+
+//Payload information
+System.log("BlueprintName: " + payload.get("blueprintName")) ;
+System.log("ComponentId: " + payload.get("componentId")) ;
+System.log("ComponentTypeId: " + payload.get("componentTypeId")) ;
+System.log("EndpointId: " + payload.get("endpointId")) ;
+System.log("RequestId: " + payload.get("requestId")) ;
+System.log("VirtualMachineEvent: " + payload.get("virtualMachineEvent")) ;
+System.log("WorkflowNextState: " + payload.get("workflowNextState")) ;
+
+//Lifecycle State information
+var lifecycleState = payload.get("lifecycleState") ;
+System.log("State: " + lifecycleState.get("state")) ;
+System.log("Phase: " + lifecycleState.get("phase")) ;
+System.log("Event: " + lifecycleState.get("event")) ;
+
+//Machine information
+var machine = payload.get("machine") ;
+System.log("ID: " + machine.get("id")) ;
+System.log("Name: " + machine.get("name")) ;
+System.log("ExternalReference: " + machine.get("externalReference")) ;
+System.log("Owner: " + machine.get("owner")) ;
+System.log("Type: " + machine.get("type")) ;
+System.log("Properties: " + machine.get("properties")) ;
+
+/*
+Based on the machine information we then use the standard property workflow
+to extract each individual properties in the next block of code!
+
+WARNING THESE PROPERTIES ARE ONLY AVAILABLE IF THE BLUEPRINT HAS THE PROPER CUSTOM PROPERTY
+
+Examples:
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.Requested
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.MachineProvisioned
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.BuildingMachine
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.Disposing
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.Expired
+Extensibility.Lifecycle.Properties.VMPSMasterWorkflow32.UnprovisionMachine
+
+Set the value of these properties to * in order to get every property associated
+*/
+var vRAVmProperties = machine.get("properties") ;
+if (vRAVmProperties != null) {
+	var log = "";
+	log += "vRA VM properties :\n";
+	var array = new Array();
+	for each (var key in vRAVmProperties.keys) {
+		array.push(key + " : " + vRAVmProperties.get(key));
+	}
+	array.sort();
+
+	for each (var line in array) {
+		log += "\t" + line + "\n";
+	}
+	System.log(log);
+}
+
+
+
+
+
+vmname=machine.get("name");
+ip_address=vRAVmProperties.get("VirtualMachine.Network0.Address");
+memory=vRAVmProperties.get("VirtualMachine.Memory.Size");
+disks_size=vRAVmProperties.get("VirtualMachine.Disk0.Size");
+cpus=vRAVmProperties.get("VirtualMachine.CPU.Count");
+entityID=machine.get("id");
+
+System.log("Hostname is " + vmname);
+System.log("IP is " + ip_address);
+System.log("CPU count is " + cpus);
+System.log("Memory is " + memory);
+System.log("Disk Size is " + disks_size);
+        </script>
+
+        <in-binding>
+            <bind name="payload" type="Properties" export-name="payload"/>
+        </in-binding>
+
+        <out-binding>
+            <bind name="vmname" type="string" export-name="vmname"/>
+            <bind name="cpus" type="String" export-name="cpus"/>
+            <bind name="ip_address" type="String" export-name="ip_address"/>
+            <bind name="memory" type="String" export-name="memory"/>
+            <bind name="disks_size" type="String" export-name="disks_size"/>
+        </out-binding>
+
+        <position x="204.5" y="55.40909090909091"/>
+    </workflow-item>
+
+    <workflow-item name="item2" out-name="item3" type="link" linked-workflow-id="db52d340-ccaa-4f4b-b192-9a4c39a4eed3">
+        <display-name>cmdb_Insert</display-name>
+
+        <in-binding>
+            <bind name="name" type="string" export-name="vmname">
+                <description>name</description>
+            </bind>
+            <bind name="cpus" type="String" export-name="cpus"/>
+            <bind name="disks_size" type="String" export-name="disks_size"/>
+            <bind name="ip_address" type="String" export-name="ip_address"/>
+            <bind name="memory" type="String" export-name="memory"/>
+        </in-binding>
+
+        <out-binding>
+            <bind name="outHeaders" type="Properties" explicitly-not-bound="true">
+                <description>Headers returned in the response.</description>
+            </bind>
+            <bind name="outParameters" type="Properties" explicitly-not-bound="true">
+                <description>Parameters returned in the response.</description>
+            </bind>
+            <bind name="sys_id" type="string" export-name="sys_id"/>
+        </out-binding>
+
+        <description>Autogenerated workflow.</description>
+
+        <position x="344.5" y="55.40909090909091"/>
+    </workflow-item>
+
+    <workflow-item name="item3" out-name="item0" type="task">
+        <display-name>Write sys_id to vRA VM</display-name>
+
+        <script encoded="false">
+virtualMachineAddOrUpdateProperties = new Properties () ;
+virtualMachineAddOrUpdateProperties.put("sys_id", sys_id) ;
+        </script>
+
+        <in-binding>
+            <bind name="payload" type="Properties" export-name="payload"/>
+            <bind name="sys_id" type="string" export-name="sys_id"/>
+        </in-binding>
+
+        <out-binding>
+            <bind name="virtualMachineAddOrUpdateProperties" type="Properties" export-name="virtualMachineAddOrUpdateProperties"/>
+        </out-binding>
+
+        <position x="484.5" y="55.40909090909091"/>
+    </workflow-item>
+
+    <presentation>
+        <p-param name="payload">
+            <desc>payload</desc>
+        </p-param>
+    </presentation>
+</workflow>

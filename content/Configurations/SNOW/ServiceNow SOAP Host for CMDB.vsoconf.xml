@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config-element id="0c6c6d7d-94f7-4af7-b963-debf74715e26" version="0.0.0">
+    <display-name>ServiceNow SOAP Host for CMDB</display-name>
+    <description>Update your unique SOAP host information here. Mark Andreopoulos 12-29-2015</description>
+    <atts>
+        <att name="soapHost" type="SOAP:Host" read-only="false">
+            <value encoded="n">dunes://service.dunes.ch/CustomSDKObject?id='af707089-cf71-4ff0-971f-da68d27e88f0'&amp;dunesName='SOAP:Host'</value>
+        </att>
+    </atts>
+</config-element>

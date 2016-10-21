@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package id="ff80808157e4b4360157e615ebc70008">
+    <name>com.vmware.set.national.snow.VRA7</name>
+    <description/>
+    <workflows>
+        <id-509d9994-f07c-4000-8daa-823bbce1baee path="SNOW/cmdb_update.workflow.xml"/>
+        <id-93735bcb-671e-4b23-a78b-a3a797384ad6 path="SNOW/master_cmdb_insert_vRA7.workflow.xml"/>
+        <id-b3b7128c-2312-44eb-8c5c-184d39246477 path="SNOW/master_cmdb_update_vRA7.workflow.xml"/>
+        <id-db52d340-ccaa-4f4b-b192-9a4c39a4eed3 path="SNOW/cmdb_Insert.workflow.xml"/>
+    </workflows>
+    <actions/>
+    <configurations>
+        <id-0c6c6d7d-94f7-4af7-b963-debf74715e26 path="SNOW/ServiceNow SOAP Host for CMDB.vsoconf.xml"/>
+    </configurations>
+    <resources/>
+</package>
